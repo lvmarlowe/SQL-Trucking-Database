@@ -1,6 +1,6 @@
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
 ![T-SQL](https://img.shields.io/badge/T--SQL-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)
-![Database Design](https://img.shields.io/badge/Database%20Design-3rd%20Normal%20Form-blue?style=for-the-badge)
+![Database Design](https://img.shields.io/badge/Database%20Design-Relational%20Schema-blue?style=for-the-badge)
 
 # XYZ Trucking Database
 
@@ -11,95 +11,65 @@ SQL Server database prototype for managing trucking fleet operations, including 
 ## Tech Stack
 
 - **Database:** Microsoft SQL Server
+- **Tools:** Microsoft SQL Server Management Studio
 - **Language:** T-SQL
-- **Tools:** SQL Server Management Studio
-- **Design:** Relational database design, 3rd normal form, lookup tables
+- **Design:** Relational database design with lookup tables
 - **Access Layer:** Stored procedures
+- **Integrity:** Primary keys, foreign keys, unique indexes, and check constraints
 
 ---
 
 ## Core Features
 
 - Driver, truck, trailer, haul, cargo manifest, and maintenance tracking
-- Lookup tables for controlled values such as cargo type, truck type, truck body type, trailer type, maintenance type, and maintenance code
-- Stored procedures for inserts, updates, deletes, queries, and reports
-- Primary keys, foreign keys, and unique indexes for data integrity
-- Create scripts and insert scripts with sample data for testing
+- Lookup tables for controlled values such as cargo type, item, truck type, truck body type, trailer type, maintenance type, and maintenance code
+- Sample data for drivers, trucks, trailers, haul records, haul line items, lookup values, and maintenance records
+- Stored procedures for inserting records into core and lookup tables
+- Stored procedures for deleting records from core and lookup tables
+- Stored procedures for selected update operations
+- Report stored procedures for maintenance, haul records, haul inventory, and shipment weight
+- Primary keys, foreign keys, unique indexes, and check constraints for data integrity
 
 ---
 
 ## Database Design
 
-The database is designed around a simplified trucking workflow where each haul is associated with one driver, one truck, and, when applicable, one trailer. Haul records connect operational details such as client, cargo type, start date, delivery date, mileage, and notes. Haul line items store the delivered inventory for each haul.
+The database is designed around a simplified trucking workflow where each haul record is associated with one driver and one truck. Trucks may be single-unit vehicles or tractor-trailer vehicles, and tractor-trailer trucks are required to have trailer information.
 
-Lookup tables are used for repeated controlled values, including cargo types, truck types, truck body types, trailer types, maintenance types, and maintenance codes. This keeps the design normalized and reduces duplicated text across operational tables.
+Haul records store client, cargo type, start date, delivery date, mileage, and notes. Haul line items connect delivered inventory to a specific haul record. Maintenance records connect trucks to maintenance date ranges, maintenance types, and maintenance codes.
 
 | Area | Tables |
 |---|---|
-| Fleet | Truck, Trailer |
-| People | Driver |
-| Hauls | HaulRecord, HaulLineItem |
-| Maintenance | Maintenance |
-| Lookup Data | LUCargoType, LUItem, LUMaintenanceCode, LUMaintenanceType, LUTrailerType, LUTruckBodyType, LUTruckType |
+| Fleet | `Truck`, `Trailer` |
+| People | `Driver` |
+| Hauls | `HaulRecord`, `HaulLineItem` |
+| Maintenance | `Maintenance` |
+| Lookup Data | `LUCargoType`, `LUItem`, `LUMaintenanceCode`, `LUMaintenanceType`, `LUTrailerType`, `LUTruckBodyType`, `LUTruckType` |
 
 ---
 
-## Project Requirements
+## Assignment Context
 
-This project was created for a database design course. The assignment required a prototype database system for XYZ Trucking, a fictional company managing fleet movement, cargo delivery, driver assignments, and truck maintenance.
+This project was created for a database design final project. The assignment required a prototype database system for XYZ Trucking, a fictional company managing fleet movement, cargo delivery, driver assignments, trailer information, and truck maintenance.
 
-The final project required:
-
-- Tables in 3rd normal form
-- Lookup tables
-- Stored procedures for query, insert, update, delete, and report operations
-- Create scripts
-- Insert scripts for lookup and sample data
-- Sample data so the system could be tested
+The project requirements included system design documents, tables in 3rd normal form, lookup tables, stored procedures for query, insert, and delete operations, in-code comments, create scripts, and insert scripts with lookup and sample data.
 
 ---
 
 ## Stored Procedures
 
-The database uses stored procedures as the access layer for data manipulation and reporting. This supports the project requirement that a future web-based front end would interact with the database through stored procedures instead of direct table access.
+The SQL script includes stored procedures for database operations and reports. Insert procedures add records to core and lookup tables. Delete procedures remove records by identifiers or record-specific values. Update procedures support selected changes, including driver commercial license status, truck mileage, trailer mileage, and haul record dates.
 
 Report procedures include:
 
-- Truck maintenance by date range
-- Haul records by truck and date range
-- Haul inventory by truck and date range
-- Shipment weight reporting
+- `ReportMaintenance`
+- `ReportHaulRecord`
+- `ReportHaulRecordInventory`
+- `ReportHaulShipmentWeight`
 
 ---
 
-## Project Structure
-
-```text
-XYZTruckingDatabase/
-    XYZTruckingDatabase.sql      Database creation, schema, sample data, constraints, and procedures
-    README.md                    Project overview and setup instructions
-```
-
----
-
-## Getting Started
-
-**Prerequisites**
-
-- Microsoft SQL Server
-- SQL Server Management Studio or another SQL Server client
-- Permission to create and execute a database script
-
-**Setup**
-
-1. Open SQL Server Management Studio.
-2. Connect to a SQL Server instance.
-3. Open `XYZTruckingDatabase.sql`.
-4. Review the database file path in the `CREATE DATABASE` statement and update it if needed.
-5. Execute the script.
-6. Confirm that the database, tables, sample data, indexes, keys, and stored procedures were created.
-
-**Example report execution**
+## Example Report Executions
 
 ```sql
 USE XYZTruckingDatabase;
@@ -109,6 +79,24 @@ EXEC dbo.ReportMaintenance
     @StartDate = '2021-01-01',
     @EndDate = '2021-12-31';
 GO
+```
+
+```sql
+USE XYZTruckingDatabase;
+GO
+
+EXEC dbo.ReportHaulShipmentWeight
+    @HaulRecordID = 2;
+GO
+```
+
+---
+
+## Project Structure
+
+```text
+XYZTruckingDatabase/
+    XYZTruckingDatabase.sql      Database creation, schema, sample data, constraints, and stored procedures
 ```
 
 ---
